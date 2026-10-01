@@ -73,14 +73,14 @@ Other data
 weather_df |> 
   ggplot(aes(x = date, y = tmax, color = name)) +
   geom_point(alpha = .5) +
-  geom_smooth(se = F)
-  facet_grid(.~ name)
+  geom_smooth(se = F) +
+  facet_grid(cols = vars(name))
 
 weather_df |> 
   ggplot(aes(x = date, y = tmax, color = name)) +
   geom_point(aes(size = prcp), alpha = .5) +
-  geom_smooth(se = F)
-  facet_grid(.~ name)
+  geom_smooth(se = F) +
+  facet_grid(cols = vars(name))
 ```
 
 Learning assessment:
@@ -92,5 +92,61 @@ weather_df |>
     tmin = tmin * (9 / 5) + 32) |> 
   ggplot(aes(x = tmin, y = tmax)) +
   geom_point() 
+```
+Hex shape point
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmax, y = tmin)) + 
+  geom_hex()
+```
+Histogram
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmax)) + 
+  geom_histogram()
+
+weather_df |> 
+  ggplot(aes(x = tmax, fill = name)) + 
+  geom_histogram() + 
+  facet_grid(. ~ name)
+```
+
+Density
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmax, fill = name)) + 
+  geom_density(alpha = .3) # alpha is the clearness of the color  
+```
+
+Boxplot
+```{r}
+weather_df |> 
+  ggplot(aes(x = name, y = tmax)) + 
+  geom_boxplot()
+
+# Violin
+weather_df |> 
+  ggplot(aes(x = name, y = tmax, fill = name)) + 
+  geom_violin(alpha = 0.3)
+```
+Ridge plots
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmax, y = name)) + 
+  geom_density_ridges() # separate out the plot horizontally
+```
+## Save some of my plots
+```{r}
+ggp_weather = 
+  weather_df |> 
+  ggplot(aes(x = date, y = tmax, color = name)) + 
+  geom_point(aes(color = name), alpha = .5) + 
+  facet_grid(.~ name)
+
+ggp_weather
+
+ggsave("ggp_weather.pdf", ggp_weather)
+
 ```
 
