@@ -19,4 +19,78 @@ weather_df
 
 ```
 
+Basic Scatterplot
+
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax)) ## no data
+
+```
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax)) + 
+  geom_point()
+
+```
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point()
+
+# labeling the plot
+ggp_temp_scatterplot = 
+  weather_df |>
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point()
+
+```
+Little bit fancier :)
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = .25) +
+  geom_smooth(se = F)
+```
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(aes(color = name), alpha = .25) + # assign color specific for the point not the smooth or any others in the plot. 
+  geom_smooth(se = F)
+```
+Show faceting
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = .25) +
+  facet_grid(.~name)
+
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = .25) +
+  facet_grid(cols = vars(name))
+```
+Other data
+```{r}
+weather_df |> 
+  ggplot(aes(x = date, y = tmax, color = name)) +
+  geom_point(alpha = .5) +
+  geom_smooth(se = F)
+  facet_grid(.~ name)
+
+weather_df |> 
+  ggplot(aes(x = date, y = tmax, color = name)) +
+  geom_point(aes(size = prcp), alpha = .5) +
+  geom_smooth(se = F)
+  facet_grid(.~ name)
+```
+
+Learning assessment:
+```{r}
+weather_df |> 
+  filter(name == "CentralPark_NY") |> 
+  mutate(
+    tmax = tmax * (9 / 5) + 32,
+    tmin = tmin * (9 / 5) + 32) |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point() 
+```
 
