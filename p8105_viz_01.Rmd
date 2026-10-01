@@ -1,0 +1,22 @@
+---
+title: "p8015_viz_01"
+author: "Yiman Rui"
+date: "2026-10-01"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(ggridges)
+
+library(p8105.datasets)
+data("weather_df")
+weather_df
+
+```
+
+
