@@ -43,11 +43,11 @@ weather_df |>
     color = "Location",
     caption = "Data from NOAA for these weather stations."
   ) +
-  scatter_x_continous (
+  scale_x_continuous (
     breaks = c(-10, 0, 15),
     labels = c("-10 C", "0", "Fifteen")
   ) + 
-  scale_by_continous(
+  scale_y_continuous(
     trans = "sqrt",
     position = "right"
   )
@@ -57,5 +57,149 @@ weather_df |>
 weather_df |> 
   ggplot(aes(x = tmin, y = tmax, col = name)) + 
   geom_point() + scale_color_hue(h = c(100, 300))
+```
+
+```{r}
+ggp_temp_plot = 
+  weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, col = name)) + 
+  geom_point() + 
+  viridis::scale_color_viridis(
+    name = "Location", 
+    discrete = TRUE
+  )
+
+ggp_temp_plot
+```
+Legends position
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, col = name)) + 
+  geom_point() + 
+  viridis::scale_color_viridis(
+    name = "Location", 
+    discrete = TRUE
+  ) + 
+  theme_classic() +
+  theme(legend.position = "bottom") 
+```
+Update tmax + date plot
+```{r}
+weather_df |> 
+  ggplot(aes(x = date, y = tmax, col = name)) + 
+  geom_point() + 
+  geom_smooth(se = F) +
+  labs(
+    title = "Seasonal Trend in Max temp",
+    x = "Date",
+    y = "Max Temp",
+    caption = "Max daily temp in three weather stateion in 2021 and 2020",
+    color = "Location"
+  ) +
+  viridis::scale_color_viridis(
+    discrete = TRUE
+  ) + 
+  theme_minimal() +
+  theme(legend.position = "bottom") 
+```
+## Two more plots weird but useful :)
+```{r}
+central_park_df = 
+  weather_df |> 
+  filter(name == "CentralPark_NY")
+
+molokai_df = 
+  weather_df |> 
+  filter(name == "Molokai_HI")
+
+ggplot(data = molokai_df, aes(x = date, y = tmax, color = name)) + 
+  geom_point() + 
+  geom_line(data = central_park_df) 
+```
+
+Mutiple panesl with different plot types
+```{r}
+ggp_tmax_tmin = 
+  weather_df |> 
+  ggplot(aes(x = tmax, y = tmin, color = name)) + 
+  geom_point() + 
+  theme(legend.position = "none")
+
+
+ggp_prcp_dens = 
+  weather_df |> 
+  filter(prcp > 0) |> 
+  ggplot(aes(x = prcp, fill = name)) + 
+  geom_density(alpha = .5) +
+  theme(legend.position = "none")
+
+ggp_tmax_date = 
+  weather_df |> 
+  ggplot(aes(x = date, y = tmax, color = name)) + 
+  geom_point(alpha = .5) +
+  geom_smooth(se = FALSE) + 
+  theme(legend.position = "bottom")
+
+(ggp_tmax_tmin + ggp_prcp_dens) / ggp_tmax_date
+```
+## Data manipulation
+
+Boxplots!
+```{r}
+weather_df |>
+  ggplot(aes(x = name, y = tmax)) + 
+  geom_boxplot()
+
+weather_df |>
+  mutate(name = fct_relevel(name, c("Molokai_HI", "CentralPark_NY", "Waterhole_WA"))) |> 
+  ggplot(aes(x = name, y = tmax)) +
+  geom_boxplot()
+
+weather_df |>
+  mutate(name = fct_reorder(name, tmax)) |> 
+  ggplot(aes(x = name, y = tmax)) +
+  geom_boxplot()
+
+```
+
+```{r}
+weather_df |>
+  select(name, tmax, tmin) |> 
+  pivot_longer(
+    tmax:tmin,
+    names_to = "observation", 
+    values_to = "temp") |> 
+  ggplot(aes(x = temp, fill = observation)) +
+  geom_density(alpha = .5) + 
+  facet_grid(~name) + 
+  viridis::scale_fill_viridis(discrete = TRUE)
+```
+
+Make a FAS plot
+```{r}
+pup_df = 
+  read_csv("~/Desktop/Data Science/Data/FAS_pups.csv", na = c("NA", ".", ""), skip = 3) |>
+  janitor::clean_names() 
+
+litter_df = 
+  read_csv("~/Desktop/Data Science/Data/FAS_litters.csv", na = c("NA", ".", "")) |>
+  janitor::clean_names() |>
+  separate(group, into = c("dose", "day_of_tx"), sep = 3)
+
+fas_df = left_join(pup_df, litter_df, by = "litter_number") 
+
+fas_df |> 
+  select(sex, dose, day_of_tx, pd_ears:pd_walk) |> 
+  pivot_longer(
+    pd_ears:pd_walk,
+    names_to = "outcome", 
+    values_to = "pn_day") |> 
+  drop_na() |> 
+  mutate(outcome = forcats::fct_reorder(outcome, pn_day, median)) |> 
+  ggplot(aes(x = dose, y = pn_day)) + 
+  geom_boxplot() + 
+  facet_grid(day_of_tx ~ outcome)
+
+
 ```
 
