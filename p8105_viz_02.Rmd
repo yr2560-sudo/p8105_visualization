@@ -1,0 +1,61 @@
+---
+title: "P8105_viz_02"
+author: "Yiman Rui"
+date: "2026-10-06"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Set up
+```{r}
+library(tidyverse)
+library(patchwork)
+
+library(p8105.datasets)
+data("weather_df")
+```
+Scatterplot
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, col = name)) + 
+  geom_point() +
+  labs(
+    title = "Temperature (Max vs Min)",
+    x = "Max Temperature (C)",
+    y = "Min Temperature (C)",
+    color = "Location",
+    caption = "Data from NOAA for these weather stations."
+  )
+```
+
+Colar scale
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, col = name)) + 
+  geom_point() +
+  labs(
+    title = "Temperature (Max vs Min)",
+    x = "Max Temperature (C)",
+    y = "Min Temperature (C)",
+    color = "Location",
+    caption = "Data from NOAA for these weather stations."
+  ) +
+  scatter_x_continous (
+    breaks = c(-10, 0, 15),
+    labels = c("-10 C", "0", "Fifteen")
+  ) + 
+  scale_by_continous(
+    trans = "sqrt",
+    position = "right"
+  )
+```
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, col = name)) + 
+  geom_point() + scale_color_hue(h = c(100, 300))
+```
+
